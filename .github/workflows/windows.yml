@@ -4,11 +4,20 @@ on:
   push:
 
 jobs:
-  stable:
-    runs-on: windows-2019
+  determine-flutter-versions:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: satackey/action-docker-layer-caching@v0.0.11
-        continue-on-error: true
-      - name: Pull base image
-        run: docker pull cirrusci/windowsservercore:visualstudio2019
+      - name: Close Flutter stable
+        run: |
+          git clone https://github.com/flutter/flutter.git flutter_stable
+          git checkout d7bacf9b3fb21caf532ce2fe0dfba12518d35d4f
+          ./flutter_stable/bin/flutter --version
+    
+#   stable:
+#     runs-on: windows-2019
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: satackey/action-docker-layer-caching@v0.0.11
+#         continue-on-error: true
+#       - name: Pull base image
+#         run: docker pull cirrusci/windowsservercore:visualstudio2019

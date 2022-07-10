@@ -21,6 +21,7 @@ jobs:
         uses: docker/build-push-action@v3
         with:
           pull: true
+          platforms: windows/amd64
           context: windows\tools
           push: true
           tags: ky1vstar/flutter-tools:wsc2019-vs2019

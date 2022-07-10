@@ -1,0 +1,23 @@
+name: Build Windows Tools image
+
+on: workflow_dispatch
+
+jobs: 
+  build:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@v3
+        with:
+          pull: true
+          context: windows\tools
+          push: true
+          tags: ky1vstar/flutter-tools:wsc2019-vs2019

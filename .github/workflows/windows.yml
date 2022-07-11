@@ -57,8 +57,8 @@ jobs:
 
       - name: Push image
         run: |
-          docker push ky1vstar/flutter:stable-wsc2019-vs2019
           docker push "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-wsc2019-vs2019"
+          docker push ky1vstar/flutter:stable-wsc2019-vs2019
 
 
   cache_flutter_version:

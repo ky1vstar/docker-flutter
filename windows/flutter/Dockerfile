@@ -12,7 +12,7 @@ RUN powershell.exe -Command \
 
 RUN setx path "%path%;C:\flutter\bin;C:\flutter\bin\cache\dart-sdk\bin;"
 
-RUN git clone -b $flutter_branch https://github.com/flutter/flutter.git C:\flutter
+RUN git clone -b %flutter_branch% https://github.com/flutter/flutter.git C:\flutter
 
 RUN flutter config --no-analytics
 

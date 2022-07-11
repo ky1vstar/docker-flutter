@@ -30,7 +30,7 @@ jobs:
       - name: Check if there is a new Flutter version
         id: check_if_new_stable_version
         run: |
-          echo "::set-output name=has_new_version::$(if [ "${{ steps.get_stable_commit.outputs.hash }}" = "$(cat windows/.version_cache/stable)" ]; then echo "false"; else echo "true"; fi)"
+          echo "::set-output name=has_new_version::$(if [ "${{ steps.get_stable_commit.outputs.hash }}" = "$(cat windows/.version_cache/stable)" ]; then echo 1; else echo 0; fi)"
 
       - name: Print outputs
         run: |
@@ -45,7 +45,7 @@ jobs:
     if: ${{ needs.get_flutter_version.outputs.has_new_stable_version }}
     steps:
       - uses: actions/checkout@v2
-      - run: echo ${{ steps.get_stable_version.outputs.version }} ${{ steps.check_if_new_stable_version.outputs.has_new_version }}
+      - run: echo "${{ steps.get_stable_version.outputs.version }} ${{ steps.check_if_new_stable_version.outputs.has_new_version }}"
 #       - uses: satackey/action-docker-layer-caching@v0.0.11
 #         continue-on-error: true
 #       - name: Pull base image

@@ -42,7 +42,7 @@ jobs:
   stable:
     runs-on: windows-2019
     needs: get_flutter_version
-    if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == "true" }}
+    if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
     steps:
       - uses: actions/checkout@v2
       - run: echo "${{ needs.get_flutter_version.outputs.stable_version }} ${{ needs.get_flutter_version.outputs.stable_commit }}"

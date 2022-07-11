@@ -1,23 +1,45 @@
 name: Build Windows Containers
 
-on:
-  push:
+on: workflow_dispatch
 
 jobs:
-  determine-flutter-versions:
+  get_flutter_version:
     runs-on: ubuntu-latest
+    outputs:
+      stable_version: ${{ steps.get_stable_version.outputs.version }}
+      stable_commit: ${{ steps.get_stable_commit.outputs.hash }}
+      has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version }}
     steps:
-      - name: Close Flutter stable
+      - uses: actions/checkout@v2
+
+      - name: Clone Flutter stable
+        run: git clone -b stable https://github.com/flutter/flutter.git flutter_stable
+
+      - name: Get Flutter version
+        id: get_stable_version
         run: |
-          git clone -b stable https://github.com/flutter/flutter.git flutter_stable
+          ./flutter_stable/bin/flutter --version
+          echo "::set-output name=version::$(./flutter_stable/bin/flutter --version | grep -oP '\d+\.\d\.\d')"
+
+      - name: Get Flutter commit hash
+        id: get_stable_commit
+        run: |
           cd flutter_stable
-          git checkout d7bacf9b3fb21caf532ce2fe0dfba12518d35d4f
-          ./bin/flutter --version
-    
-#   stable:
-#     runs-on: windows-2019
-#     steps:
-#       - uses: actions/checkout@v2
+          echo "::set-output name=hash::$(git rev-parse HEAD)"
+
+      - name: Check if there is a new Flutter version
+        id: check_if_new_stable_version
+        run: |
+          echo "::set-output name=has_new_version::$(if [ "${{ steps.get_stable_commit.outputs.hash }}" = "$(cat windows/.version_cache/stable)" ]; then echo "true"; else echo "false"; fi)"
+
+
+  stable:
+    runs-on: windows-2019
+    needs: get-flutter-version
+    if: ${{ needs.get_flutter_version.outputs.has_new_stable_version }}
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo ${{ steps.get_stable_version.outputs.version }} ${{ steps.check_if_new_stable_version.outputs.has_new_version }}
 #       - uses: satackey/action-docker-layer-caching@v0.0.11
 #         continue-on-error: true
 #       - name: Pull base image

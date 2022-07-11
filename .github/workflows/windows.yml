@@ -1,4 +1,4 @@
-name: Build Windows Containers
+name: Build Windows Flutter image
 
 on: workflow_dispatch
 
@@ -35,7 +35,7 @@ jobs:
 
   stable:
     runs-on: windows-2019
-    needs: get-flutter-version
+    needs: get_flutter_version
     if: ${{ needs.get_flutter_version.outputs.has_new_stable_version }}
     steps:
       - uses: actions/checkout@v2

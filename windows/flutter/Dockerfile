@@ -18,4 +18,6 @@ RUN flutter config --no-analytics
 
 RUN flutter config --enable-windows-desktop
 
+RUN flutter precache --windows
+
 RUN flutter doctor -v

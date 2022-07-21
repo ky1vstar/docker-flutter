@@ -1,6 +1,9 @@
 name: Build Windows Flutter image
 
-on: workflow_dispatch
+on:
+  workflow_dispatch
+  schedule:
+    - cron: '30 */2 * * *'
 
 jobs:
   get_flutter_version:
@@ -66,13 +69,13 @@ jobs:
   cache_flutter_version:
     runs-on: ubuntu-latest
     needs: [get_flutter_version, build_stable]
+    if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
     steps:
       - uses: actions/checkout@v2
         with:
           ref: version_cache
 
       - name: Write Flutter version
-        if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
         run: echo "${{ needs.get_flutter_version.outputs.stable_commit }}" > windows/stable
 
       - uses: stefanzweifel/git-auto-commit-action@v4

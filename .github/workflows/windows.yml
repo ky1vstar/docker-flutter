@@ -17,7 +17,7 @@ jobs:
     outputs:
       stable_version: ${{ steps.get_stable_version.outputs.version }}
       stable_commit: ${{ steps.get_stable_commit.outputs.hash }}
-      has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build }}
+      has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build2 }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -47,7 +47,7 @@ jobs:
         run: |
           echo "stable_version: ${{ steps.get_stable_version.outputs.version }}"
           echo "stable_commit: ${{ steps.get_stable_commit.outputs.hash }}"
-          echo "has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version || inputs.force_stable_build }}"
+          echo "has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build2 }}"
 
 
   build_stable:

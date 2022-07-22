@@ -23,6 +23,8 @@ jobs:
         with:
           ref: version_cache
 
+      - run: echo ${{ inputs.force_stable_build }}
+
       - name: Clone Flutter stable
         run: git clone -b stable https://github.com/flutter/flutter.git flutter_stable
 
@@ -53,24 +55,23 @@ jobs:
   build_stable:
     runs-on: windows-2019
     needs: get_flutter_version
-    # if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
+    if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
     steps:
       - uses: actions/checkout@v2
 
       - name: Login to DockerHub
-        run: echo ${{ needs.get_flutter_version.outputs.has_new_stable_version }}
-      #   run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"
+        run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"
 
-      # - name: Pull base image
-      #   run: docker pull ky1vstar/flutter-tools:wsc2019-vs2019
+      - name: Pull base image
+        run: docker pull ky1vstar/flutter-tools:wsc2019-vs2019
 
-      # - name: Build image
-      #   run: docker build --build-arg flutter_branch=stable --build-arg "flutter_hash=${{ needs.get_flutter_version.outputs.stable_commit }}" --tag ky1vstar/flutter:stable-wsc2019-vs2019 --tag "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-wsc2019-vs2019" windows\flutter
+      - name: Build image
+        run: docker build --build-arg flutter_branch=stable --build-arg "flutter_hash=${{ needs.get_flutter_version.outputs.stable_commit }}" --tag ky1vstar/flutter:stable-wsc2019-vs2019 --tag "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-wsc2019-vs2019" windows\flutter
 
-      # - name: Push image
-      #   run: |
-      #     docker push "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-wsc2019-vs2019"
-      #     docker push ky1vstar/flutter:stable-wsc2019-vs2019
+      - name: Push image
+        run: |
+          docker push "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-wsc2019-vs2019"
+          docker push ky1vstar/flutter:stable-wsc2019-vs2019
 
 
   cache_flutter_version:

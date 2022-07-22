@@ -17,13 +17,11 @@ jobs:
     outputs:
       stable_version: ${{ steps.get_stable_version.outputs.version }}
       stable_commit: ${{ steps.get_stable_commit.outputs.hash }}
-      has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build == 'true' }}
+      has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build }}
     steps:
       - uses: actions/checkout@v2
         with:
           ref: version_cache
-
-      - run: echo ${{ inputs.force_stable_build }}
 
       - name: Clone Flutter stable
         run: git clone -b stable https://github.com/flutter/flutter.git flutter_stable
@@ -49,7 +47,7 @@ jobs:
         run: |
           echo "stable_version: ${{ steps.get_stable_version.outputs.version }}"
           echo "stable_commit: ${{ steps.get_stable_commit.outputs.hash }}"
-          echo "has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version }}"
+          echo "has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version || inputs.force_stable_build }}"
 
 
   build_stable:

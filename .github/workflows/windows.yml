@@ -17,7 +17,7 @@ jobs:
     outputs:
       stable_version: ${{ steps.get_stable_version.outputs.version }}
       stable_commit: ${{ steps.get_stable_commit.outputs.hash }}
-      has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build2 }}
+      has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build }}
     steps:
       - uses: actions/checkout@v2
         with:
@@ -41,13 +41,13 @@ jobs:
       - name: Check if there is a new Flutter version
         id: check_if_new_stable_version
         run: |
-          echo "::set-output name=has_new_version::$(if [ "${{ steps.get_stable_commit.outputs.hash }}" = "$(cat windows/stable)" ]; then echo "true"; else echo "true"; fi)"
+          echo "::set-output name=has_new_version::$(if [ "${{ steps.get_stable_commit.outputs.hash }}" = "$(cat windows/stable)" ]; then echo "false"; else echo "true"; fi)"
 
       - name: Print outputs
         run: |
           echo "stable_version: ${{ steps.get_stable_version.outputs.version }}"
           echo "stable_commit: ${{ steps.get_stable_commit.outputs.hash }}"
-          echo "has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build2 }}"
+          echo "has_new_stable_version: ${{ steps.check_if_new_stable_version.outputs.has_new_version == 'true' || inputs.force_stable_build }}"
 
 
   build_stable:

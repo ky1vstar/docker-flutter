@@ -1,6 +1,7 @@
 FROM ky1vstar/flutter-tools:wsc2019-vs2019
 
 ARG flutter_branch=stable
+ARG flutter_hash=any
 
 # Install Google Root R1 cert so pub.dartlang.org stays working
 
@@ -13,6 +14,9 @@ RUN powershell.exe -Command \
 RUN setx path "%path%;C:\flutter\bin;C:\flutter\bin\cache\dart-sdk\bin;"
 
 RUN git clone -b %flutter_branch% https://github.com/flutter/flutter.git C:\flutter
+
+RUN cd C:\flutter && powershell.exe -Command \
+        if ($env:flutter_hash -ne 'any' -And $env:flutter_hash -ne $(git rev-parse HEAD)) { throw 'Hash mismatch' }
 
 RUN flutter config --no-analytics
 

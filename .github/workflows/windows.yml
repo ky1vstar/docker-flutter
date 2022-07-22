@@ -10,8 +10,6 @@ on:
         required: true
         default: false
         type: boolean
-  workflow_dispatch:
-    inputs:
       force_master_build:
         description: 'Force master build'     
         required: true

@@ -16,7 +16,7 @@ RUN setx path "%path%;C:\flutter\bin;C:\flutter\bin\cache\dart-sdk\bin;"
 RUN git clone -b %flutter_branch% https://github.com/flutter/flutter.git C:\flutter
 
 RUN cd C:\flutter && powershell.exe -Command \
-        if ($env:flutter_hash -ne 'any' -And $env:flutter_hash -ne $(git rev-parse HEAD)) { throw 'Hash mismatch' }
+        if ($env:flutter_hash -ne 'any') { git reset --hard $env:flutter_hash }
 
 RUN flutter config --no-analytics
 

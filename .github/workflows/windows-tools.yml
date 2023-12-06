@@ -24,7 +24,9 @@ jobs:
         run: docker pull cirrusci/android-sdk:30-windowsservercore-2019
 
       - name: Build image
-        run: docker build --tag ky1vstar/flutter-tools:wsc2019-vs2019 --tag ghcr.io/${{ github.repository }}/flutter-tools:wsc2019-vs2019 windows\tools
+        run: docker build --tag ky1vstar/flutter-tools:wsc2019-vs2019 --tag ghcr.io/${{ github.repository_owner }}/flutter-tools:wsc2019-vs2019 windows\tools
 
-      - name: Push image
-        run: docker push ky1vstar/flutter-tools:wsc2019-vs2019 ghcr.io/${{ github.repository }}/flutter-tools:wsc2019-vs2019
+      - name: Push images
+        run: |
+            docker push ky1vstar/flutter-tools:wsc2019-vs2019
+            docker push ghcr.io/${{ github.repository_owner }}/flutter-tools:wsc2019-vs2019

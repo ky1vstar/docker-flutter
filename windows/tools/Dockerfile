@@ -1,4 +1,27 @@
-FROM cirrusci/android-sdk:30-windowsservercore-2019
+ARG server_version=2022
+
+# Base image on microsoft/dotnet-framework:4.7.1 or later as adviced by Microsoft.
+# https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container-issues
+FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc${server_version}
+
+ARG server_version
+
+## https://github.com/cirruslabs/docker-images-windows/blob/41b4e03c85b1f8a50d866f2eb47ba3e8af17cbf5/windowsservercore/Dockerfile
+RUN powershell -NoLogo -NoProfile -Command \
+    netsh interface ipv4 show interfaces ; \
+    netsh interface ipv4 set subinterface 18 mtu=1460 store=persistent ; \
+    netsh interface ipv4 show interfaces ; \
+    Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) ; \
+    choco install -y --no-progress git --parameters="/GitAndUnixToolsOnPath" ; \
+    choco install -y --no-progress 7zip ; \
+    Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ; \
+    Remove-Item $Env:localappdata\Nuget\Cache\*nupkg ; \
+    Remove-Item $Env:temp\* -Force -Recurse;
+
+## https://github.com/cirruslabs/docker-images-android/blob/cd2a41ec49be26c3e5482546385a55a32183f334/sdk/tools-windowsservercore-2019/Dockerfile
+RUN powershell.exe -Command \
+    git config --global user.email "support@cirruslabs.org"; \
+    git config --global user.name "Cirrus CI";
 
 # Install VS
 ## https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2019

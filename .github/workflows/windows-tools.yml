@@ -7,7 +7,18 @@ on:
 
 jobs: 
   build:
-    runs-on: windows-2019
+    matrix:
+      server_version: [2019, 2022]
+      vs:
+        - version: 2019
+          buildtools_version: 16
+        - version: 2022
+          buildtools_version: 17
+      exclude:
+        - server_version: 2022
+          vs: 
+            version: 2019
+    runs-on: windows-${{ matrix.server_version }}
     permissions:
       contents: read
       packages: write
@@ -21,12 +32,12 @@ jobs:
         run: docker login --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" ghcr.io
 
       - name: Pull base image
-        run: docker pull cirrusci/android-sdk:30-windowsservercore-2019
+        run: docker pull mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc${{ matrix.server_version }}
 
       - name: Build image
-        run: docker build --tag ky1vstar/flutter-tools:wsc2019-vs2019 --tag ghcr.io/${{ github.repository_owner }}/flutter-tools:wsc2019-vs2019 windows\tools
+        run: docker build --build-arg server_version=${{ matrix.server_version }} --build-arg vs_buildtools_version=${{ matrix.vs.buildtools_version }} --tag ky1vstar/flutter-tools:wsc${{ matrix.server_version }}-vs${{ matrix.vs.version }} --tag ghcr.io/${{ github.repository_owner }}/flutter-tools:wsc${{ matrix.server_version }}-vs${{ matrix.vs.version }} windows\tools
 
       - name: Push images
         run: |
-            docker push ky1vstar/flutter-tools:wsc2019-vs2019
-            docker push ghcr.io/${{ github.repository_owner }}/flutter-tools:wsc2019-vs2019
+            docker push ky1vstar/flutter-tools:wsc${{ matrix.server_version }}-vs${{ matrix.vs.version }}
+            docker push ghcr.io/${{ github.repository_owner }}/flutter-tools:wsc${{ matrix.server_version }}-vs${{ matrix.vs.version }}

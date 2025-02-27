@@ -16,7 +16,7 @@ RUN powershell -NoLogo -NoProfile -Command \
     choco install -y --no-progress git --parameters="/GitAndUnixToolsOnPath" ; \
     choco install -y --no-progress 7zip ; \
     Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ; \
-    Remove-Item $Env:localappdata\NuGet\v3-cache\* -Force -Recurse -ErrorAction SilentlyContinue ;
+    try { Remove-Item $Env:localappdata\NuGet\v3-cache\* -Force -Recurse } catch {} ;
 
 RUN pushd "%temp%" && (rd /s /q "%temp%" 2>nul & popd)
 

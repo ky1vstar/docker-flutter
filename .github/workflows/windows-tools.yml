@@ -7,17 +7,18 @@ on:
 
 jobs: 
   build:
-    matrix:
-      server_version: [2019, 2022]
-      vs:
-        - version: 2019
-          buildtools_version: 16
-        - version: 2022
-          buildtools_version: 17
-      exclude:
-        - server_version: 2022
-          vs: 
-            version: 2019
+    strategy:
+      matrix:
+        server_version: [2019, 2022]
+        vs:
+          - version: 2019
+            buildtools_version: 16
+          - version: 2022
+            buildtools_version: 17
+        exclude:
+          - server_version: 2022
+            vs: 
+              version: 2019
     runs-on: windows-${{ matrix.server_version }}
     permissions:
       contents: read

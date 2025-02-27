@@ -16,8 +16,8 @@ RUN powershell -NoLogo -NoProfile -Command \
     choco install -y --no-progress git --parameters="/GitAndUnixToolsOnPath" ; \
     choco install -y --no-progress 7zip ; \
     Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ; \
-    Remove-Item $Env:localappdata\NuGet\v3-cache\* ; \
-    Get-ChildItem $Env:temp\* -Recurse | Remove-Item -Force -Recurse
+    Remove-Item $Env:localappdata\NuGet\v3-cache\* -Force -Recurse ; \
+    Get-ChildItem $Env:temp\* -Recurse | Remove-Item -Force -Recurse ;
 
 ## https://github.com/cirruslabs/docker-images-android/blob/cd2a41ec49be26c3e5482546385a55a32183f334/sdk/tools-windowsservercore-2019/Dockerfile
 RUN powershell.exe -Command \

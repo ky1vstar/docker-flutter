@@ -15,8 +15,11 @@ RUN powershell -NoLogo -NoProfile -Command \
     Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) ; \
     choco install -y --no-progress git --parameters="/GitAndUnixToolsOnPath" ; \
     choco install -y --no-progress 7zip ; \
-    Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ; \
-    try { Remove-Item $Env:localappdata\NuGet\v3-cache\* -Force -Recurse } catch {} ;
+    Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ;
+
+# RUN powershell -NoLogo -NoProfile -Command \
+#     Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ; \
+#     try { Remove-Item $Env:localappdata\NuGet\v3-cache\* -Force -Recurse } catch {} ;
 
 RUN pushd "%temp%" && (rd /s /q "%temp%" 2>nul & popd)
 

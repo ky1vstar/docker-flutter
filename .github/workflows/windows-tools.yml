@@ -33,7 +33,7 @@ jobs:
         run: docker login --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" ghcr.io
 
       - name: Pull base image
-        run: docker pull mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc${{ matrix.server_version }}
+        run: docker pull mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc${{ matrix.config.server_version }}
 
       - name: Build image
         run: >

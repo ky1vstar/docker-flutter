@@ -18,9 +18,7 @@ RUN powershell -NoLogo -NoProfile -Command \
     Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ;
 
 # RUN powershell -NoLogo -NoProfile -Command \
-#     Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ; \
-#     try { Remove-Item $Env:localappdata\NuGet\v3-cache\* -Force -Recurse } catch {} ;
-
+#     Remove-Item $Env:localappdata\NuGet\v3-cache\* -Force -Recurse ;
 RUN pushd "%temp%" && (rd /s /q "%temp%" 2>nul & popd)
 
 ## https://github.com/cirruslabs/docker-images-android/blob/cd2a41ec49be26c3e5482546385a55a32183f334/sdk/tools-windowsservercore-2019/Dockerfile
@@ -29,13 +27,13 @@ RUN powershell.exe -Command \
     git config --global user.name "Cirrus CI";
 
 # Install VS
-## https://docs.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2019
+## https://learn.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2019
 ## https://learn.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2022
 
 ## Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
 
-## https://docs.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2019
+## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2019
 ## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022
 RUN \
     # Download the Build Tools bootstrapper.
@@ -56,3 +54,22 @@ RUN \
     # Cleanup
     && del /q vs_buildtools.exe
 
+## Download the Build Tools bootstrapper.
+ADD https://aka.ms/vs/${vs_buildtools_version}/release/channel C:/TEMP/VisualStudio.chman
+
+ADD https://aka.ms/vs/${vs_buildtools_version}/release/vs_buildtools.exe C:/TEMP/vs_buildtools.exe
+## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2019
+## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022
+RUN C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache \
+    --channelUri C:\TEMP\VisualStudio.chman \
+    --installChannelUri C:\TEMP\VisualStudio.chman \
+    # Install Build Tools with the Microsoft.VisualStudio.Workload.VCTool workload, includingWindows SDK 10.0.19041 required by Flutter.
+    --add Microsoft.VisualStudio.Workload.VCTools \
+    --add Microsoft.VisualStudio.Component.Windows10SDK.19041 \
+    --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
+    --add Microsoft.VisualStudio.Component.VC.CMake.Project \
+    --add Microsoft.VisualStudio.Workload.NativeDesktop \
+    --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools \
+    --add Microsoft.VisualStudio.Component.VC.CLI.Support \
+    --installPath C:\BuildTools \
+     || IF "%ERRORLEVEL%"=="3010" EXIT 0

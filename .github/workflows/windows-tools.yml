@@ -36,6 +36,7 @@ jobs:
           Get-Content C:\ProgramData\Docker\Config\Daemon.json | Out-String
           Stop-Service *docker*
           Start-Service *docker*
+          docker info
 
       - name: Login to Docker Hub
         run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"

@@ -7,8 +7,6 @@ FROM mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc${serv
 # VS 2019 = 16, VS 2022 = 17
 ARG vs_buildtools_version=17
 
-RUN powershell -c get-psdrive
-
 ## https://github.com/cirruslabs/docker-images-windows/blob/41b4e03c85b1f8a50d866f2eb47ba3e8af17cbf5/windowsservercore/Dockerfile
 RUN powershell -NoLogo -NoProfile -Command \
     netsh interface ipv4 show interfaces ; \

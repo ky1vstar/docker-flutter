@@ -17,7 +17,7 @@ jobs:
             vs_buildtools_version: 17
             image_tag: flutter-tools:wsc2019
           - server_version: 2022
-            vs_buildtools_version: 17
+            vs_buildtools_version: 16
             image_tag: flutter-tools:wsc2022
     runs-on: windows-${{ matrix.config.server_version }}
     permissions:
@@ -34,17 +34,17 @@ jobs:
           dockerd --register-service --storage-opt size=100G
           Start-Service *docker*
       
-      - name: Free Disk Space
-        shell: cmd
-        run: |
-          fsutil volume diskfree c:
-          rmdir /S /Q C:\Android
-          rmdir /S /Q %JAVA_HOME_8_X64%
-          rmdir /S /Q %JAVA_HOME_11_X64%
-          rmdir /S /Q %JAVA_HOME_17_X64%
-          rmdir /S /Q %JAVA_HOME_21_X64%
-          rmdir /S /Q "C:\Program Files (x86)\Microsoft Visual Studio"
-          fsutil volume diskfree c:
+      # - name: Free Disk Space
+      #   shell: cmd
+      #   run: |
+      #     fsutil volume diskfree c:
+      #     rmdir /S /Q C:\Android
+      #     rmdir /S /Q %JAVA_HOME_8_X64%
+      #     rmdir /S /Q %JAVA_HOME_11_X64%
+      #     rmdir /S /Q %JAVA_HOME_17_X64%
+      #     rmdir /S /Q %JAVA_HOME_21_X64%
+      #     rmdir /S /Q "C:\Program Files (x86)\Microsoft Visual Studio"
+      #     fsutil volume diskfree c:
 
       - name: Login to Docker Hub
         run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"

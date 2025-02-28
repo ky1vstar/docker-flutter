@@ -29,12 +29,9 @@ jobs:
       # https://stackoverflow.com/questions/56992563/vs-buildtools-wont-install-in-docker-container-on-windows-server-2016
       - name: Fix Docker container storage size
         run: |
-          $daemon_json = Get-Content C:\ProgramData\Docker\Config\Daemon.json | Out-String | ConvertFrom-Json
-          $daemon_json | Add-Member -MemberType NoteProperty -Name "storage-opts" -Value ([PSCustomObject]@("size=100GB"))
-          $daemon_json | ConvertTo-Json | Set-Content C:\ProgramData\Docker\Config\Daemon.json
           Stop-Service *docker*
           dockerd --unregister-service
-          dockerd --register-service --storage-opt size=100G
+          dockerd --register-service --storage-opt size=50G
           Start-Service *docker*
 
       - name: Login to Docker Hub

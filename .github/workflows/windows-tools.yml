@@ -26,6 +26,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # https://stackoverflow.com/questions/56992563/vs-buildtools-wont-install-in-docker-container-on-windows-server-2016
+      - name: Fix Docker container storage size
+        run: |
+          $daemon_json = Get-Content C:\ProgramData\Docker\Config\Daemon.json | Out-String | ConvertFrom-Json
+          $daemon_json | Add-Member -MemberType NoteProperty -Name "storage-opts" -Value ([PSCustomObject]@("size=100GB"))
+          $daemon_json | ConvertTo-Json | Set-Content C:\ProgramData\Docker\Config\Daemon.json
+          Stop-Service docker
+          Start-Service docker
+
       - name: Login to Docker Hub
         run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"
 
@@ -37,14 +46,14 @@ jobs:
 
       - name: Build image
         run: >
-            docker build 
-            --build-arg server_version=${{ matrix.config.server_version }}
-            --build-arg vs_buildtools_version=${{ matrix.config.vs_buildtools_version }}
-            --tag ky1vstar/${{ matrix.config.image_tag }}
-            --tag ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}
-            windows\tools
+          docker build 
+          --build-arg server_version=${{ matrix.config.server_version }}
+          --build-arg vs_buildtools_version=${{ matrix.config.vs_buildtools_version }}
+          --tag ky1vstar/${{ matrix.config.image_tag }}
+          --tag ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}
+          windows\tools
 
       - name: Push images
         run: |
-            docker push ky1vstar/${{ matrix.config.image_tag }}
-            docker push ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}
+          docker push ky1vstar/${{ matrix.config.image_tag }}
+          docker push ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}

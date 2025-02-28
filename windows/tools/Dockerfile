@@ -33,31 +33,10 @@ RUN powershell.exe -Command \
 ## Restore the default Windows shell for correct batch processing.
 SHELL ["cmd", "/S", "/C"]
 
-## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2019
-## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022
-RUN \
-    # Download the Build Tools bootstrapper.
-    curl -SL --output vs_buildtools.exe https://aka.ms/vs/${vs_buildtools_version}/release/vs_buildtools.exe \
-    \
-    # Install Build Tools with the Microsoft.VisualStudio.Workload.VCTool workload, includingWindows SDK 10.0.19041 required by Flutter.
-    && (start /w vs_buildtools.exe --quiet --wait --norestart --nocache \
-        --installPath "C:\BuildTools" \
-        --add Microsoft.VisualStudio.Workload.VCTools \
-        --add Microsoft.VisualStudio.Component.Windows10SDK.19041 \
-        --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
-        --add Microsoft.VisualStudio.Component.VC.CMake.Project \
-        --add Microsoft.VisualStudio.Workload.NativeDesktop \
-        --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools \
-        --add Microsoft.VisualStudio.Component.VC.CLI.Support \
-        || IF "%ERRORLEVEL%"=="3010" EXIT 0) \
-    \
-    # Cleanup
-    && del /q vs_buildtools.exe
-
 ## Download the Build Tools bootstrapper.
-ADD https://aka.ms/vs/${vs_buildtools_version}/release/channel C:/TEMP/VisualStudio.chman
+ADD https://aka.ms/vs/${vs_buildtools_version}/release/channel C:\TEMP\VisualStudio.chman
+ADD https://aka.ms/vs/${vs_buildtools_version}/release/vs_buildtools.exe C:\TEMP\vs_buildtools.exe
 
-ADD https://aka.ms/vs/${vs_buildtools_version}/release/vs_buildtools.exe C:/TEMP/vs_buildtools.exe
 ## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2019
 ## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022
 RUN C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache \
@@ -73,3 +52,5 @@ RUN C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --add Microsoft.VisualStudio.Component.VC.CLI.Support \
     --installPath C:\BuildTools \
      || IF "%ERRORLEVEL%"=="3010" EXIT 0
+
+     RUN rmdir /S /Q C:\TEMP

@@ -33,6 +33,15 @@ jobs:
           dockerd --unregister-service
           dockerd --register-service --storage-opt size=50G
           Start-Service *docker*
+      
+      - name: Free Disk Space
+        shell: cmd
+        run: |
+          rmdir /S /Q C:\Android
+          rmdir /S /Q %JAVA_HOME_8_X64%
+          rmdir /S /Q %JAVA_HOME_11_X64%
+          rmdir /S /Q %JAVA_HOME_17_X64%
+          rmdir /S /Q %JAVA_HOME_21_X64%
 
       - name: Login to Docker Hub
         run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"

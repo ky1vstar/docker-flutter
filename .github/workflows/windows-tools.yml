@@ -46,7 +46,6 @@ jobs:
           rmdir /S /Q C:\tools
           rmdir /S /Q C:\vcpkg
           rmdir /S /Q C:\hostedtoolcache
-#          rmdir /S /Q "C:\Program Files (x86)\Microsoft Visual Studio"
           fsutil volume diskfree c:
 
       - name: Login to Docker Hub

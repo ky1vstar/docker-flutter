@@ -101,18 +101,6 @@ jobs:
             windows\flutter
           }
 
-          $multiarch_tags = (-split $env:multiarch_tags)
-
-          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:stable-" + $_ }
-          docker manifest create ky1vstar/flutter:stable @push_tags
-          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:stable-" + $_ }
-          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:stable @push_tags
-
-          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-" + $_ }
-          docker manifest create ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }} @push_tags
-          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-" + $_ }
-          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }} @push_tags
-
       - name: Build master image
         if: ${{ needs.get_flutter_version.outputs.has_new_master_version == 'true' }}
         run: |
@@ -127,13 +115,6 @@ jobs:
             windows\flutter
           }
 
-          $multiarch_tags = (-split $env:multiarch_tags)
-
-          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:master-" + $_ }
-          docker manifest create ky1vstar/flutter:master @push_tags
-          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:master-" + $_ }
-          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:master @push_tags
-
       - name: Push stable image
         if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
         run: |
@@ -143,6 +124,18 @@ jobs:
             docker push ky1vstar/flutter:stable-$image_tag
             docker push ghcr.io/${{ github.repository_owner }}/flutter:stable-$image_tag
           }
+
+          $multiarch_tags = (-split $env:multiarch_tags)
+
+          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:stable-" + $_ }
+          docker manifest create ky1vstar/flutter:stable @push_tags
+          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:stable-" + $_ }
+          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:stable @push_tags
+
+          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-" + $_ }
+          docker manifest create ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }} @push_tags
+          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-" + $_ }
+          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }} @push_tags
 
           docker manifest push ky1vstar/flutter:stable
           docker manifest push ghcr.io/${{ github.repository_owner }}/flutter:stable
@@ -156,6 +149,13 @@ jobs:
             docker push ky1vstar/flutter:master-$image_tag
             docker push ghcr.io/${{ github.repository_owner }}/flutter:master-$image_tag
           }
+
+          $multiarch_tags = (-split $env:multiarch_tags)
+
+          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:master-" + $_ }
+          docker manifest create ky1vstar/flutter:master @push_tags
+          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:master-" + $_ }
+          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:master @push_tags
 
           docker manifest push ky1vstar/flutter:master
           docker manifest push ghcr.io/${{ github.repository_owner }}/flutter:master

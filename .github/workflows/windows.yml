@@ -89,15 +89,15 @@ jobs:
         if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
         run: |
           foreach ($image_tag in -split $env:image_tags) {
-            docker build \
-            --isolation hyperv \
-            --build-arg base_image_tag=$image_tag \
-            --build-arg flutter_branch=stable \
-            --build-arg "flutter_hash=${{ needs.get_flutter_version.outputs.stable_commit }}" \
-            --tag ky1vstar/flutter:stable-$image_tag \
-            --tag ghcr.io/${{ github.repository_owner }}/flutter:stable-$image_tag \
-            --tag "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-$image_tag" \
-            --tag "ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-$image_tag" \
+            docker build `
+            --isolation hyperv `
+            --build-arg base_image_tag=$image_tag `
+            --build-arg flutter_branch=stable `
+            --build-arg "flutter_hash=${{ needs.get_flutter_version.outputs.stable_commit }}" `
+            --tag ky1vstar/flutter:stable-$image_tag `
+            --tag ghcr.io/${{ github.repository_owner }}/flutter:stable-$image_tag `
+            --tag "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-$image_tag" `
+            --tag "ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-$image_tag" `
             windows\flutter
           }
 
@@ -117,13 +117,13 @@ jobs:
         if: ${{ needs.get_flutter_version.outputs.has_new_master_version == 'true' }}
         run: |
           foreach ($image_tag in -split $env:image_tags) {
-            docker build \
-            --isolation hyperv \
-            --build-arg base_image_tag=$image_tag \
-            --build-arg flutter_branch=master \
-            --build-arg "flutter_hash=${{ needs.get_flutter_version.outputs.master_commit }}" \
-            --tag ky1vstar/flutter:master-$image_tag \
-            --tag ghcr.io/${{ github.repository_owner }}/flutter:master-$image_tag \
+            docker build `
+            --isolation hyperv `
+            --build-arg base_image_tag=$image_tag `
+            --build-arg flutter_branch=master `
+            --build-arg "flutter_hash=${{ needs.get_flutter_version.outputs.master_commit }}" `
+            --tag ky1vstar/flutter:master-$image_tag `
+            --tag ghcr.io/${{ github.repository_owner }}/flutter:master-$image_tag `
             windows\flutter
           }
 

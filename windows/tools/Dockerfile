@@ -24,7 +24,8 @@ RUN pushd "%temp%" && (rd /s /q "%temp%" 2>nul & popd)
 ## https://github.com/cirruslabs/docker-images-android/blob/cd2a41ec49be26c3e5482546385a55a32183f334/sdk/tools-windowsservercore-2019/Dockerfile
 RUN powershell.exe -Command \
     git config --global user.email "support@cirruslabs.org"; \
-    git config --global user.name "Cirrus CI";
+    git config --global user.name "Cirrus CI"; \
+    git config --system --add safe.directory '*';
 
 # Install VS
 ## https://learn.microsoft.com/en-us/visualstudio/install/build-tools-container?view=vs-2019

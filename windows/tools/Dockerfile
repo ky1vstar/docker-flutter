@@ -34,8 +34,8 @@ RUN powershell.exe -Command \
 SHELL ["cmd", "/S", "/C"]
 
 ## Download the Build Tools bootstrapper.
-ADD https://aka.ms/vs/${vs_buildtools_version}/release/channel C:\TEMP\VisualStudio.chman
-ADD https://aka.ms/vs/${vs_buildtools_version}/release/vs_buildtools.exe C:\TEMP\vs_buildtools.exe
+ADD https://aka.ms/vs/${vs_buildtools_version}/release/channel C:/TEMP/VisualStudio.chman
+ADD https://aka.ms/vs/${vs_buildtools_version}/release/vs_buildtools.exe C:/TEMP/vs_buildtools.exe
 
 ## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2019
 ## https://learn.microsoft.com/en-us/visualstudio/install/workload-component-id-vs-build-tools?view=vs-2022

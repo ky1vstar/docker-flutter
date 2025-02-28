@@ -43,14 +43,10 @@ ADD https://aka.ms/vs/${vs_buildtools_version}/release/vs_buildtools.exe C:/TEMP
 RUN C:\TEMP\vs_buildtools.exe --quiet --wait --norestart --nocache \
     --channelUri C:\TEMP\VisualStudio.chman \
     --installChannelUri C:\TEMP\VisualStudio.chman \
-    # Install Build Tools with the Microsoft.VisualStudio.Workload.VCTool workload, includingWindows SDK 10.0.19041 required by Flutter.
+    --includeRecommended \
+    # Install Build Tools with the Microsoft.VisualStudio.Workload.VCTool workload, including Windows SDK 10.0.19041 required by Flutter.
     --add Microsoft.VisualStudio.Workload.VCTools \
     --add Microsoft.VisualStudio.Component.Windows10SDK.19041 \
-    --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
-    --add Microsoft.VisualStudio.Component.VC.CMake.Project \
-    --add Microsoft.VisualStudio.Workload.NativeDesktop \
-    --add Microsoft.VisualStudio.Workload.ManagedDesktopBuildTools \
-    --add Microsoft.VisualStudio.Component.VC.CLI.Support \
     --installPath C:\BuildTools \
      || IF "%ERRORLEVEL%"=="3010" EXIT 0
 

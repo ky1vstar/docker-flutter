@@ -1,4 +1,6 @@
-FROM ky1vstar/flutter-tools:wsc2019-vs2019
+ARG base_image_tag=wsc2022
+
+FROM ky1vstar/flutter-tools:${base_image_tag}
 
 ARG flutter_branch=stable
 ARG flutter_hash=any

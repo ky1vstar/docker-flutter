@@ -31,7 +31,7 @@ jobs:
         run: |
           Stop-Service *docker*
           dockerd --unregister-service
-          dockerd --register-service --storage-opt size=50G
+          dockerd --register-service --storage-opt size=100G
           Start-Service *docker*
       
       - name: Free Disk Space
@@ -46,7 +46,7 @@ jobs:
           rmdir /S /Q C:\tools
           rmdir /S /Q C:\vcpkg
           rmdir /S /Q C:\hostedtoolcache
-          rmdir /S /Q "C:\Program Files (x86)\Microsoft Visual Studio"
+#          rmdir /S /Q "C:\Program Files (x86)\Microsoft Visual Studio"
           fsutil volume diskfree c:
 
       - name: Login to Docker Hub

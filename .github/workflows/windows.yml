@@ -67,6 +67,9 @@ jobs:
 
   build:
     runs-on: windows-2022
+    permissions:
+      contents: read
+      packages: write
     needs: get_flutter_version
     if: ${{ needs.get_flutter_version.outputs.has_new_version == 'true' }}
     env:

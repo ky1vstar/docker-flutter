@@ -17,7 +17,7 @@ jobs:
             vs_buildtools_version: 17
             image_tag: flutter-tools:wsc2019
           - server_version: 2022
-            vs_buildtools_version: 16
+            vs_buildtools_version: 17
             image_tag: flutter-tools:wsc2022
     runs-on: windows-${{ matrix.config.server_version }}
     permissions:

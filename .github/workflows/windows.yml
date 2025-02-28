@@ -73,14 +73,17 @@ jobs:
     needs: get_flutter_version
     if: ${{ needs.get_flutter_version.outputs.has_new_version == 'true' }}
     env:
-      image_tags: wsc2019-vs2019 wsc2019
-      multiarch_tags: wsc2019
+      image_tags: wsc2019-vs2019 wsc2019 wsc2022
+      multiarch_tags: wsc2019 wsc2022
       DOCKER_CLI_EXPERIMENTAL: enabled
     steps:
       - uses: actions/checkout@v4
 
       - name: Login to DockerHub
         run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"
+      
+      - name: Login to GitHub Packages
+        run: docker login --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" ghcr.io
 
       - name: Pull base image
         run: |

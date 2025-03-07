@@ -28,43 +28,37 @@ jobs:
 
       # https://stackoverflow.com/questions/56992563/vs-buildtools-wont-install-in-docker-container-on-windows-server-2016
       - name: Fix Docker container storage size
-        run: |
-          Stop-Service *docker*
-          dockerd --unregister-service
-          dockerd --register-service --storage-opt size=100G
-          Start-Service *docker*
-      
-      # - name: Free Disk Space
-      #   shell: cmd
-      #   run: |
-      #     fsutil volume diskfree c:
-      #     rmdir /S /Q C:\Android
-      #     rmdir /S /Q %JAVA_HOME_8_X64%
-      #     rmdir /S /Q %JAVA_HOME_11_X64%
-      #     rmdir /S /Q %JAVA_HOME_17_X64%
-      #     rmdir /S /Q %JAVA_HOME_21_X64%
-      #     rmdir /S /Q "C:\Program Files (x86)\Microsoft Visual Studio"
-      #     fsutil volume diskfree c:
+        uses: docker/setup-docker-action@v4
+        with:
+          daemon-config: |
+            {
+              "storage-opts": [
+                "size=100GB"
+              ]
+            }
 
       - name: Login to Docker Hub
-        run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Login to GitHub Packages
-        run: docker login --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" ghcr.io
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Pull base image
-        run: docker pull mcr.microsoft.com/dotnet/framework/runtime:4.8-windowsservercore-ltsc${{ matrix.config.server_version }}
-
-      - name: Build image
-        run: >
-          docker build 
-          --build-arg server_version=${{ matrix.config.server_version }}
-          --build-arg vs_buildtools_version=${{ matrix.config.vs_buildtools_version }}
-          --tag ky1vstar/${{ matrix.config.image_tag }}
-          --tag ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}
-          windows\tools
-
-      - name: Push images
-        run: |
-          docker push ky1vstar/${{ matrix.config.image_tag }}
-          docker push ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: windows\tools
+          pull: true
+          push: true
+          build-args: |
+            server_version=${{ matrix.config.server_version }}
+            vs_buildtools_version=${{ matrix.config.vs_buildtools_version }}
+          tags: |
+            ky1vstar/${{ matrix.config.image_tag }}
+            ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}

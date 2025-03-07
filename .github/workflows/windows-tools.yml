@@ -27,16 +27,15 @@ jobs:
       - uses: actions/checkout@v4
 
       # https://stackoverflow.com/questions/56992563/vs-buildtools-wont-install-in-docker-container-on-windows-server-2016
-      # - name: Fix Docker container storage size
-      #   uses: docker/setup-docker-action@v4
-      #   with:
-      #     daemon-config: |
-      #       {
-      #         "experimental": true,
-      #         "storage-opts": [
-      #           "size=100GB"
-      #         ]
-      #       }
+      - name: Fix Docker container storage size
+        uses: docker/setup-docker-action@v4
+        with:
+          daemon-config: |
+            {
+              "storage-opts": [
+                "size=100GB"
+              ]
+            }
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -51,20 +50,17 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          platforms: windows/amd64
+      - name: Build images
+        run: >
+          docker build 
+          --pull
+          --build-arg server_version=${{ matrix.config.server_version }}
+          --build-arg vs_buildtools_version=${{ matrix.config.vs_buildtools_version }}
+          --tag ky1vstar/${{ matrix.config.image_tag }}
+          --tag ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}
+          windows\tools
 
-      - name: Build and push image
-        uses: docker/build-push-action@v6
-        with:
-          context: windows\tools
-          pull: true
-          push: true
-          build-args: |
-            server_version=${{ matrix.config.server_version }}
-            vs_buildtools_version=${{ matrix.config.vs_buildtools_version }}
-          tags: |
-            ky1vstar/${{ matrix.config.image_tag }}
-            ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}
+      - name: Push images
+        run: |
+          docker push ky1vstar/${{ matrix.config.image_tag }}
+          docker push ghcr.io/${{ github.repository_owner }}/${{ matrix.config.image_tag }}

@@ -32,7 +32,7 @@ function generate_config_for_channel() {
     if docker_tag_exists ky1vstar/flutter "$flutter_version"; then
         :
     else 
-        configs_json=$(echo "$configs_json" | jq '. += [{ "flutter_version": "'"$flutter_version"'", "flutter_channel": "'"$flutter_channel"'", "update_channel_image": true }]')
+        configs_json=$(echo "$configs_json" | jq -c '. += [{ "flutter_version": "'"$flutter_version"'", "flutter_channel": "'"$flutter_channel"'", "update_channel_image": true }]')
     fi
 }
 

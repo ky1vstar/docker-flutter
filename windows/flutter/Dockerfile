@@ -13,7 +13,7 @@ RUN powershell.exe -Command \
 # Install Flutter
 RUN setx path "%path%;C:\flutter\bin;C:\flutter\bin\cache\dart-sdk\bin;"
 
-ADD https://storage.googleapis.com/flutter_infra_release/releases/${flutter_channel}/windows/flutter_windows_${flutter_version}-${flutter_channel}.zip C:\TEMP\flutter_windows.zip
+ADD https://storage.googleapis.com/flutter_infra_release/releases/${flutter_channel}/windows/flutter_windows_${flutter_version}-${flutter_channel}.zip C:/TEMP/flutter_windows.zip
 RUN powershell.exe -Command Expand-Archive -LiteralPath C:\TEMP\flutter_windows.zip -DestinationPath C:\
 RUN del /q C:\TEMP\*.*
 

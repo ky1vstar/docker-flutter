@@ -29,7 +29,7 @@ jobs:
       configs: ${{ steps.configs.outputs.configs }}
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Define configs
         id: configs
         run: |
@@ -42,6 +42,7 @@ jobs:
 
   build:
     needs: define_configs
+    if: ${{ needs.define_configs.outputs.configs != '[]' }}
     strategy:
       matrix:
         config: ${{ fromJSON(needs.define_configs.outputs.configs) }}
@@ -58,6 +59,7 @@ jobs:
 
   manifest:
     needs: [define_configs, build]
+    if: ${{ needs.define_configs.outputs.configs != '[]' }}
     strategy:
       matrix:
         config: ${{ fromJSON(needs.define_configs.outputs.configs) }}

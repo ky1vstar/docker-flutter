@@ -1,0 +1,75 @@
+on:
+  workflow_call:
+    inputs:
+      flutter_version:
+        required: true
+        type: string
+      flutter_channel:
+        required: true
+        type: string
+      update_channel_image:
+        required: true
+        type: boolean
+    secrets:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
+        required: true
+      # Inherited automatically
+      # GITHUB_TOKEN:
+      #   required: true
+
+jobs:
+  manifest:
+    runs-on: windows-2022
+    env:
+      DOCKER_CLI_EXPERIMENTAL: enabled
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: Create manifests
+        run: |
+          docker manifest create `
+            "ky1vstar/flutter:${{ inputs.flutter_version }}" `
+            "ky1vstar/flutter:${{ inputs.flutter_version }}-wsc2019" `
+            "ky1vstar/flutter:${{ inputs.flutter_version }}-wsc2022"
+          docker manifest create `
+            "ghcr.io/${{ github.repository_owner }}/flutter:${{ inputs.flutter_version }}" `
+            "ghcr.io/${{ github.repository_owner }}/flutter:${{ inputs.flutter_version }}-wsc2019" `
+            "ghcr.io/${{ github.repository_owner }}/flutter:${{ inputs.flutter_version }}-wsc2022"
+      
+      - name: Create channel manifests
+        if: ${{ inputs.update_channel_image == true }}
+        run: |
+          docker manifest create `
+            "ky1vstar/flutter:${{ inputs.flutter_channel }}" `
+            "ky1vstar/flutter:${{ inputs.flutter_channel }}-wsc2019" `
+            "ky1vstar/flutter:${{ inputs.flutter_channel }}-wsc2022"
+          docker manifest create `
+            "ghcr.io/${{ github.repository_owner }}/flutter:${{ inputs.flutter_channel }}" `
+            "ghcr.io/${{ github.repository_owner }}/flutter:${{ inputs.flutter_channel }}-wsc2019" `
+            "ghcr.io/${{ github.repository_owner }}/flutter:${{ inputs.flutter_channel }}-wsc2022"
+      
+      - name: Push manifests
+        run: |
+          docker manifest push "ky1vstar/flutter:${{ inputs.flutter_version }}"
+          docker manifest push "ghcr.io/${{ github.repository_owner }}/flutter:${{ inputs.flutter_version }}"
+      
+      - name: Push channel manifests
+        if: ${{ inputs.update_channel_image == true }}
+        run: |
+          docker manifest push "ky1vstar/flutter:${{ inputs.flutter_channel }}"
+          docker manifest push "ghcr.io/${{ github.repository_owner }}/flutter:${{ inputs.flutter_channel }}"

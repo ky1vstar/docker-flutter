@@ -46,7 +46,23 @@ jobs:
     permissions:
       contents: read
       packages: write
-    uses: ./.github/workflows/windows-reusable.yml
+    uses: ./.github/workflows/windows-build.yml
+    with:
+      flutter_version: ${{ matrix.config.flutter_version }}
+      flutter_channel: ${{ matrix.config.flutter_channel }}
+      update_channel_image: ${{ matrix.config.update_channel_image }}
+    secrets: inherit
+
+
+  manifest:
+    needs: build
+    strategy:
+      matrix:
+        config: ${{ fromJSON(needs.define_configs.outputs.configs) }}
+    permissions:
+      contents: read
+      packages: write
+    uses: ./.github/workflows/windows-manifest.yml
     with:
       flutter_version: ${{ matrix.config.flutter_version }}
       flutter_channel: ${{ matrix.config.flutter_channel }}

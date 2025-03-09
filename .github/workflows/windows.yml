@@ -28,6 +28,8 @@ jobs:
     outputs:
       configs: ${{ steps.configs.outputs.configs }}
     steps:
+      - uses: actions/checkout@v4
+      
       - name: Define configs
         id: configs
         run: |

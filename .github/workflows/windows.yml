@@ -1,192 +1,51 @@
 name: Build Windows Flutter image
 
 on:
-  schedule:
-    - cron: '30 */2 * * *'
+  # schedule:
+  #   - cron: '30 */2 * * *'
   workflow_dispatch:
     inputs:
-      force_stable_build:
-        description: 'Force stable build'     
+      flutter_version:
+        description: 'Flutter version'     
         required: true
-        default: false
-        type: boolean
-      force_master_build:
-        description: 'Force master build'     
+        type: string
+      flutter_channel:
+        description: 'Flutter channel'     
+        required: true
+        type: choice
+        options:
+          - stable
+          - beta
+      update_channel_image:
+        description: 'Update channel image'     
         required: true
         default: false
         type: boolean
 
 jobs:
-  get_flutter_version:
+  define_configs:
     runs-on: ubuntu-latest
     outputs:
-      stable_version: ${{ steps.get_version.outputs.stable_version }}
-      stable_commit: ${{ steps.get_commit.outputs.stable_hash }}
-      has_new_stable_version: ${{ steps.check_if_new_version.outputs.has_new_stable_version == 'true' || inputs.force_stable_build == true }}
-      master_commit: ${{ steps.get_commit.outputs.master_hash }}
-      has_new_master_version: ${{ steps.check_if_new_version.outputs.has_new_master_version == 'true' || inputs.force_master_build == true }}
-      has_new_version: ${{ steps.check_if_new_version.outputs.has_new_stable_version == 'true' || steps.check_if_new_version.outputs.has_new_master_version == 'true' || inputs.force_stable_build == true || inputs.force_master_build == true }}
+      colors: ${{ steps.configs.outputs.configs }}
     steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: version_cache
-
-      - name: Clone Flutter
+      - name: Define configs
+        id: configs
         run: |
-          git clone -b stable https://github.com/flutter/flutter.git flutter_stable
-          git clone -b master https://github.com/flutter/flutter.git flutter_master
-
-      - name: Get Flutter version
-        id: get_version
-        run: |
-          ./flutter_stable/bin/flutter --version
-          echo "::set-output name=stable_version::$(./flutter_stable/bin/flutter --version | grep -oP '\d+\.\d+\.\d+')"
-
-      - name: Get Flutter commit hash
-        id: get_commit
-        run: |
-          cd flutter_stable
-          echo "::set-output name=stable_hash::$(git rev-parse HEAD)"
-          cd ../flutter_master
-          echo "::set-output name=master_hash::$(git rev-parse HEAD)"
-
-      - name: Check if there is a new Flutter version
-        id: check_if_new_version
-        run: |
-          echo "::set-output name=has_new_stable_version::$(if [ "${{ steps.get_commit.outputs.stable_hash }}" = "$(cat windows/stable)" ]; then echo "false"; else echo "true"; fi)"
-          echo "::set-output name=has_new_master_version::$(if [ "${{ steps.get_commit.outputs.master_hash }}" = "$(cat windows/master)" ]; then echo "false"; else echo "true"; fi)"
-
-      - name: Print outputs
-        run: |
-          echo "stable_version: ${{ steps.get_version.outputs.stable_version }}"
-          echo "stable_commit: ${{ steps.get_commit.outputs.stable_hash }}"
-          echo "has_new_stable_version: ${{ steps.check_if_new_version.outputs.has_new_stable_version == 'true' || inputs.force_stable_build == true }}"
-          echo "master_commit: ${{ steps.get_commit.outputs.master_hash }}"
-          echo "has_new_master_version: ${{ steps.check_if_new_version.outputs.has_new_master_version == 'true' || inputs.force_master_build == true }}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] ;then
+            echo 'configs=[{"flutter_version": "${{ inputs.flutter_version }}", "flutter_channel": "${{ inputs.flutter_channel }}, "update_channel_image": ${{ inputs.update_channel_image }}}]' >> "$GITHUB_OUTPUT"
+          else
+            echo 'configs=[{"flutter_channel": "stable"}, {"flutter_channel": "beta"}]' >> "$GITHUB_OUTPUT"
+          fi
 
 
   build:
-    runs-on: windows-2022
-    permissions:
-      contents: read
-      packages: write
-    needs: get_flutter_version
-    if: ${{ needs.get_flutter_version.outputs.has_new_version == 'true' }}
-    env:
-      image_tags: wsc2019-vs2019 wsc2019 wsc2022
-      multiarch_tags: wsc2019 wsc2022
-      DOCKER_CLI_EXPERIMENTAL: enabled
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Login to DockerHub
-        run: docker login --username "${{ secrets.DOCKERHUB_USERNAME }}" --password "${{ secrets.DOCKERHUB_TOKEN }}"
-      
-      - name: Login to GitHub Packages
-        run: docker login --username "${{ github.actor }}" --password "${{ secrets.GITHUB_TOKEN }}" ghcr.io
-
-      - name: Pull base image
-        run: |
-          foreach ($image_tag in -split $env:image_tags) {
-            docker pull ghcr.io/${{ github.repository_owner }}/flutter-tools:$image_tag
-          }
-
-      - name: Build stable image
-        if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
-        run: |
-          foreach ($image_tag in -split $env:image_tags) {
-            docker build `
-            --isolation hyperv `
-            --build-arg base_image_tag=$image_tag `
-            --build-arg flutter_branch=stable `
-            --build-arg "flutter_hash=${{ needs.get_flutter_version.outputs.stable_commit }}" `
-            --tag ky1vstar/flutter:stable-$image_tag `
-            --tag ghcr.io/${{ github.repository_owner }}/flutter:stable-$image_tag `
-            --tag "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-$image_tag" `
-            --tag "ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-$image_tag" `
-            windows\flutter
-          }
-
-      - name: Build master image
-        if: ${{ needs.get_flutter_version.outputs.has_new_master_version == 'true' }}
-        run: |
-          foreach ($image_tag in -split $env:image_tags) {
-            docker build `
-            --isolation hyperv `
-            --build-arg base_image_tag=$image_tag `
-            --build-arg flutter_branch=master `
-            --build-arg "flutter_hash=${{ needs.get_flutter_version.outputs.master_commit }}" `
-            --tag ky1vstar/flutter:master-$image_tag `
-            --tag ghcr.io/${{ github.repository_owner }}/flutter:master-$image_tag `
-            windows\flutter
-          }
-
-      - name: Push stable image
-        if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
-        run: |
-          foreach ($image_tag in -split $env:image_tags) {
-            docker push "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-$image_tag"
-            docker push "ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-$image_tag"
-            docker push ky1vstar/flutter:stable-$image_tag
-            docker push ghcr.io/${{ github.repository_owner }}/flutter:stable-$image_tag
-          }
-
-          $multiarch_tags = (-split $env:multiarch_tags)
-
-          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:stable-" + $_ }
-          docker manifest create ky1vstar/flutter:stable @push_tags
-          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:stable-" + $_ }
-          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:stable @push_tags
-
-          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-" + $_ }
-          docker manifest create ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }} @push_tags
-          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }}-" + $_ }
-          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }} @push_tags
-
-          docker manifest push ky1vstar/flutter:stable
-          docker manifest push ghcr.io/${{ github.repository_owner }}/flutter:stable
-          docker manifest push ky1vstar/flutter:${{ needs.get_flutter_version.outputs.stable_version }}
-          docker manifest push ghcr.io/${{ github.repository_owner }}/flutter:${{ needs.get_flutter_version.outputs.stable_version }}
-
-      - name: Push master image
-        if: ${{ needs.get_flutter_version.outputs.has_new_master_version == 'true' }}
-        run: |
-          foreach ($image_tag in -split $env:image_tags) {
-            docker push ky1vstar/flutter:master-$image_tag
-            docker push ghcr.io/${{ github.repository_owner }}/flutter:master-$image_tag
-          }
-
-          $multiarch_tags = (-split $env:multiarch_tags)
-
-          $push_tags = $multiarch_tags | % { "ky1vstar/flutter:master-" + $_ }
-          docker manifest create ky1vstar/flutter:master @push_tags
-          $push_tags = $multiarch_tags | % { "ghcr.io/${{ github.repository_owner }}/flutter:master-" + $_ }
-          docker manifest create ghcr.io/${{ github.repository_owner }}/flutter:master @push_tags
-
-          docker manifest push ky1vstar/flutter:master
-          docker manifest push ghcr.io/${{ github.repository_owner }}/flutter:master
-
-
-  cache_flutter_version:
-    runs-on: ubuntu-latest
-    needs: [get_flutter_version, build]
-    if: ${{ needs.get_flutter_version.outputs.has_new_version == 'true' }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          ref: version_cache
-
-      - name: Write Flutter version
-        if: ${{ needs.get_flutter_version.outputs.has_new_stable_version == 'true' }}
-        run: echo "${{ needs.get_flutter_version.outputs.stable_commit }}" > windows/stable
-
-      - name: Write Flutter version
-        if: ${{ needs.get_flutter_version.outputs.has_new_master_version == 'true' }}
-        run: echo "${{ needs.get_flutter_version.outputs.master_commit }}" > windows/master
-
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          branch: version_cache
-          commit_message: Update latest pushed Flutter version
-
-
+    needs: define_configs
+    strategy:
+      matrix:
+        config: ${{ fromJSON(needs.define_configs.outputs.configs) }}
+    uses: ./.github/workflows/windows-reusable.yml
+    with:
+      flutter_version: ${{ matrix.config.flutter_version }}
+      flutter_channel: ${{ matrix.config.flutter_channel }}
+      update_channel_image: ${{ matrix.config.update_channel_image }}
+    secrets: inherit

@@ -43,6 +43,9 @@ jobs:
     strategy:
       matrix:
         config: ${{ fromJSON(needs.define_configs.outputs.configs) }}
+    permissions:
+      contents: read
+      packages: write
     uses: ./.github/workflows/windows-reusable.yml
     with:
       flutter_version: ${{ matrix.config.flutter_version }}

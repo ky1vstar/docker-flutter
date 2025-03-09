@@ -1,3 +1,5 @@
+# escape=`
+
 ARG base_image_tag=wsc2022
 
 FROM ky1vstar/flutter-tools:${base_image_tag}
@@ -7,7 +9,7 @@ ARG flutter_channel
 
 # Install Google Root R1 cert so pub.dartlang.org stays working
 ADD https://pki.goog/repo/certs/gtsr1.pem C:/TEMP/gtsr1.pem
-RUN powershell.exe -Command \
+RUN powershell.exe -Command `
         Import-Certificate -FilePath C:\TEMP\gtsr1.pem -CertStoreLocation Cert:\LocalMachine\Root
 
 # Install Flutter

@@ -17,11 +17,11 @@ RUN powershell -NoLogo -NoProfile -Command `
     Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1')) ; `
     choco install -y --no-progress git --parameters="/GitAndUnixToolsOnPath" ; `
     choco install -y --no-progress pwsh ; `
-    Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse ;
+    Remove-Item C:\ProgramData\chocolatey\logs\* -Force -Recurse `
+    && pushd "%temp%" && (rd /s /q "%temp%" 2>nul & popd)
 
 # RUN powershell -NoLogo -NoProfile -Command \
 #     Remove-Item $Env:localappdata\NuGet\v3-cache\* -Force -Recurse ;
-RUN pushd "%temp%" && (rd /s /q "%temp%" 2>nul & popd)
 
 ## https://github.com/cirruslabs/docker-images-android/blob/cd2a41ec49be26c3e5482546385a55a32183f334/sdk/tools-windowsservercore-2019/Dockerfile
 RUN powershell.exe -Command `

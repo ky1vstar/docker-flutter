@@ -13,7 +13,7 @@ RUN powershell.exe -Command `
         Import-Certificate -FilePath C:\TEMP\gtsr1.pem -CertStoreLocation Cert:\LocalMachine\Root
 
 # Install Flutter
-RUN setx path "%path%;C:\flutter\bin;C:\flutter\bin\cache\dart-sdk\bin;"
+RUN setx path "%path%;C:\flutter\bin;C:\flutter\bin\cache\dart-sdk\bin;%LOCALAPPDATA%\Pub\Cache\bin;"
 
 RUN `
     curl -SL --output flutter_windows.zip https://storage.googleapis.com/flutter_infra_release/releases/%flutter_channel%/windows/flutter_windows_%flutter_version%-%flutter_channel%.zip `

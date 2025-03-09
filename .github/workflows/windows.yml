@@ -26,7 +26,7 @@ jobs:
   define_configs:
     runs-on: ubuntu-latest
     outputs:
-      colors: ${{ steps.configs.outputs.configs }}
+      configs: ${{ steps.configs.outputs.configs }}
     steps:
       - name: Define configs
         id: configs

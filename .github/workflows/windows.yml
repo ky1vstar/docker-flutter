@@ -32,7 +32,7 @@ jobs:
         id: configs
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]] ;then
-            echo 'configs=[{"flutter_version": "${{ inputs.flutter_version }}", "flutter_channel": "${{ inputs.flutter_channel }}, "update_channel_image": ${{ inputs.update_channel_image }}}]' >> "$GITHUB_OUTPUT"
+            echo 'configs=[{"flutter_version": "${{ inputs.flutter_version }}", "flutter_channel": "${{ inputs.flutter_channel }}", "update_channel_image": ${{ inputs.update_channel_image }}}]' >> "$GITHUB_OUTPUT"
           else
             echo 'configs=[{"flutter_channel": "stable"}, {"flutter_channel": "beta"}]' >> "$GITHUB_OUTPUT"
           fi
